@@ -87,20 +87,29 @@ data.all <- merge(data.env,data.exp,by="id_short")
 ##Publication type
 ggplot(data.sou, aes(x=publication_type)) +
         geom_bar(stat="count") +
+        scale_y_continuous("Number of sources") +
         theme_bw()
 
 ##Publication year
 ggplot(data.sou, aes(x=year)) +
         geom_bar(stat="count") +
+        scale_y_continuous("Number of sources") +
         theme_bw()
 
 ###DATA.ENV
 
 #Sampling country
-ggplot(data.env, aes(x=sample_country)) +
-        geom_bar(stat="count", na.rm=FALSE) + coord_flip() +
-        theme_bw() 
-#       + theme(axis.text.x = element_text(angle=0, vjust=0.5, hjust=1))
+gdata <- unique(data.env[,c("study_id", "sample_country")]) # create data for ggplot - using the unique function with study_id and sample_country you eliminate repeated countries within the same study
+gdata <- data.frame(table(gdata$sample_country)) # this is to create a frequency table for countries
+names(gdata) <- c("sample_country","n")
+
+ggplot(gdata, aes(x=reorder(sample_country,n),y=n)) +   # here I have added "reorder" so in the plot you can see countries ordered by frequency
+  geom_bar(stat="identity", na.rm=FALSE) + coord_flip() +
+  scale_x_discrete("Country") +
+  scale_y_continuous("Number of studies") +
+  theme_bw() 
+  # + theme(axis.text.x = element_text(angle=0, vjust=0.5, hjust=1))
+rm(gdata) # delete gdata
         
 
 ###DATA.EXP
@@ -170,8 +179,8 @@ ggplot(data.exp, aes(x=temperature_experiment, y=Vmax)) +
 
 #Boxplot + jitter for nutrients
 ggplot(data.exp, aes(x=species_type, y=Vmax)) +
-        geom_boxplot() +
-        geom_jitter() +
+        geom_boxplot(outlier.shape = NA) + # in case you want to delete the outliers (since they are already seen with the jitter points)
+        geom_jitter(width = 0.3, shape = 21) + # I have added that to improve visualisation of points
         facet_grid(.~nutrient) +
         theme_bw()
 
@@ -214,21 +223,21 @@ ggplot(data.exp, aes(x=temperature_experiment, y=uptake_rate_dw)) +
 
 #Boxplot + jitter for nutrients
 ggplot(data.exp, aes(x=species_type, y=uptake_rate_dw)) +
-        geom_boxplot() +
-        geom_jitter() +
+        geom_boxplot(outlier.shape = NA) + # in case you want to delete the outliers (since they are already seen with the jitter points)
+        geom_jitter(width = 0.3, shape = 21) + # I have added that to improve visualisation of points
         facet_grid(~nutrient) +
         theme_bw()
 
 ggplot(data.exp, aes(x=species_type, y=uptake_rate_dw)) +
-      geom_boxplot() +
-      geom_jitter() +
+      geom_boxplot(outlier.shape = NA) + # in case you want to delete the outliers (since they are already seen with the jitter points)
+      geom_jitter(width = 0.3, shape = 21) + # I have added that to improve visualisation of points
       facet_grid(type_uptake~nutrient) +
       theme_bw()
 
     #Boxplot + jitter for nutrients coloured
     ggplot(data.exp, aes(x=species_type, y=uptake_rate_dw)) +
-            geom_boxplot(aes(colour = factor(type_uptake))) +
-            geom_jitter(aes(colour = factor(type_uptake))) +
+            geom_boxplot(aes(colour = factor(type_uptake)), outlier.shape = NA) + # in case you want to delete the outliers (since they are already seen with the jitter points)
+            geom_jitter(aes(colour = factor(type_uptake)), width = 0.3, shape = 21) + # I have added that to improve visualisation of points
             facet_grid(.~nutrient) +
             theme_bw()
         
